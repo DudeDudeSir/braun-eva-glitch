@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-client = AsyncIOMotorClient(DATABASE_URI)
+client = AsyncIOMotorClient("mongodb+srv://Sachu:Sachu@cluster0.zbqkgpl.mongodb.net/?retryWrites=true&w=majority")
 db = client[DATABASE_NAME]
 instance = Instance.from_db(db)
 
@@ -66,7 +66,7 @@ async def save_file(media):
 
 
 
-async def get_search_results(query, file_type=None, max_results=10, offset=0, filter=False):
+async def get_search_results(query, file_type=None, max_results=8, offset=0, filter=False):
     """For given query return (results, next_offset)"""
 
     query = query.strip()
