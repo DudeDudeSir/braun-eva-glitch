@@ -12,3 +12,5 @@ heroku3
 pynewtonmath
 pytz
 aiohttp
+flask
+gunicorn
