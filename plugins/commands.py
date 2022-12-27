@@ -3,7 +3,7 @@ import logging
 import random
 import asyncio
 from Script import script
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.errors import ChatAdminRequired, FloodWait
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database.ia_filterdb import Media, get_file_details, unpack_new_file_id
@@ -18,15 +18,15 @@ logger = logging.getLogger(__name__)
 
 BATCH_FILES = {}
 
-@Client.on_message(filters.command("start") & filters.incoming & ~filters.edited)
+@Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
-    if message.chat.type in ['group', 'supergroup']:
+    if message.chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
         buttons = [
             [
-                InlineKeyboardButton('💢 Group', url='https://t.me/moviecenter225')
+                InlineKeyboardButton('🔯 ᴜᴘᴅᴀᴛᴇs', url='https://t.me/moviecenter225')
             ],
             [
-                InlineKeyboardButton('ℹ️ Help', url=f"https://t.me/{temp.U_NAME}?start=help"),
+                InlineKeyboardButton('ℹ🛐 ʜᴇʟᴘ', url=f"https://t.me/{temp.U_NAME}?start=help"),
             ]
             ]
         reply_markup = InlineKeyboardMarkup(buttons)
@@ -42,20 +42,20 @@ async def start(client, message):
         await client.send_message(LOG_CHANNEL, script.LOG_TEXT_P.format(message.from_user.id, message.from_user.mention))
     if len(message.command) != 2:
         buttons = [[
-            InlineKeyboardButton('➕ Add Me To Your Groups ➕', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
+            InlineKeyboardButton('⚚ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ ⚚', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
             ],[
-            InlineKeyboardButton('▪️𝐔𝐏𝐃𝐀𝐓𝐄▪️', url='https://t.me/+5JhGlEwbBbdiZTg1'),
-            InlineKeyboardButton('💢 𝐆𝐑𝐎𝐔𝐏 💢', url='https://t.me/moviecenter225')
-            ],[
-            InlineKeyboardButton('♻️ Help ♻️', callback_data='help'),
-            InlineKeyboardButton('❤️ ABOUT ❤️', callback_data='about')
+            InlineKeyboardButton('💮 ᴜᴘᴅᴀᴛᴇ 💮', url='https://t.me/moviecenter225'),
+            InlineKeyboardButton('💮 ᴍᴏᴠɪᴇs 💮', url='https://t.me/moviecenter_junction')
+            ],[      
+            InlineKeyboardButton('♻️ ʜᴇʟᴘ ♻️', callback_data='help'),
+            InlineKeyboardButton('♻️ ᴀʙᴏᴜᴛ ♻️', callback_data='about')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
         await message.reply_photo(
             photo=random.choice(PICS),
             caption=script.START_TXT.format(message.from_user.mention, temp.U_NAME, temp.B_NAME),
             reply_markup=reply_markup,
-            parse_mode='html'
+            parse_mode=enums.ParseMode.HTML
         )
         return
     if AUTH_CHANNEL and not await is_subscribed(client, message):
@@ -67,38 +67,41 @@ async def start(client, message):
         btn = [
             [
                 InlineKeyboardButton(
-                    "💢 Join Updates Channel💢", url=invite_link.invite_link
+                    "🤖 𝐉𝐨𝐢𝐧 𝐔𝐩𝐝𝐚𝐭𝐞 𝐂𝐡𝐚𝐧𝐧𝐞𝐥", url=invite_link.invite_link
                 )
             ]
         ]
 
         if message.command[1] != "subscribe":
-            kk, file_id = message.command[1].split("_", 1)
-            pre = 'checksubp' if kk == 'filep' else 'checksub' 
-            btn.append([InlineKeyboardButton(" 🔄 Try Again", callback_data=f"{pre}#{file_id}")])
+            try:
+                kk, file_id = message.command[1].split("_", 1)
+                pre = 'checksubp' if kk == 'filep' else 'checksub' 
+                btn.append([InlineKeyboardButton(" 🔄 𝐓𝐫𝐲 𝐀𝐠𝐚𝐢𝐧", callback_data=f"{pre}#{file_id}")])
+            except (IndexError, ValueError):
+                btn.append([InlineKeyboardButton(" 🔄 𝐓𝐫𝐲 𝐀𝐠𝐚𝐢𝐧", url=f"https://t.me/{temp.U_NAME}?start={message.command[1]}")])
         await client.send_message(
             chat_id=message.from_user.id,
-            text="**⚠️ YOU ARE NOT SUBSCRIBED OUR CHANNEL ⚠️\n\n🤗 JOIN ON OUR CHANNEL AND CLICK TRY AGAIN BUTTON TO GET MOVIE✅\n\n⚠️ താങ്കൾ ഞങ്ങളുടെ ചാനൽ സബ്സ്ക്രൈബ് ചെയ്തിട്ട് ഇല്ല!! ⚠️\n\n🤗 ഞങ്ങളുടെ ചാനലിൽ ജോയിൻ ചെയ്യിതിട്ടു Try Again Button Click ചെയ്യുമ്പോൾ movie കിട്ടും✅\n👇👇👇👇👇👇👇👇👇👇👇**",
+            text=f"""**♦️ 𝗥𝗘𝗔𝗗 𝗧𝗛𝗜𝗦 𝗜𝗡𝗦𝗧𝗥𝗨𝗖𝗧𝗜𝗢𝗡 ♦️\n\nനിങ്ങൾ ചോദിക്കുന്ന സിനിമകൾ ലഭിക്കണം എന്നുണ്ടെങ്കിൽ നിങ്ങൾ ഞങ്ങളുടെ ചാനലിൽ ജോയിൻ ചെയ്തിരിക്കണം. ജോയിൻ ചെയ്യാൻ "  𝗝𝗼𝗶𝗻 UPDATES  𝗖𝗵𝗮𝗻𝗻𝗲𝗹  "എന്ന ബട്ടണിൽ ക്ലിക്ക് ചെയ്യാവുന്നതാണ്.\n\nജോയിൻ ചെയ്ത ശേഷം "  𝗧𝗿𝘆 𝗔𝗴𝗮𝗶𝗻  " എന്ന ബട്ടണിൽ അമർത്തിയാൽ നിങ്ങൾക്ക് ഞാൻ ആ സിനിമ അയച്ചു തരുന്നതാണ്..\n\nJOIN UPDATES CHANNEL AND THEN CLICK TRY AGAIN BUTTON TO GET MOVIE FILE**""",
             reply_markup=InlineKeyboardMarkup(btn),
-            parse_mode="markdown"
+            parse_mode=enums.ParseMode.MARKDOWN
             )
         return
     if len(message.command) == 2 and message.command[1] in ["subscribe", "error", "okay", "help"]:
         buttons = [[
-            InlineKeyboardButton('➕ Add Me To Your Groups ➕', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
+            InlineKeyboardButton('⚚ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ ⚚', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
             ],[
-            InlineKeyboardButton('▪️𝐔𝐏𝐃𝐀𝐓𝐄▪️', url='https://t.me/+5JhGlEwbBbdiZTg1'),
-            InlineKeyboardButton('💠 𝐆𝐑𝐎𝐔𝐏 💠', url='https://t.me/moviecenter225')
-            ],[
-            InlineKeyboardButton('♻️ Help ♻️', callback_data='help'),
-            InlineKeyboardButton('🔥 About 🔥', callback_data='about')
+            InlineKeyboardButton('💮 ᴜᴘᴅᴀᴛᴇ 💮', url='https://t.me/moviecenter225'),
+            InlineKeyboardButton('💮 ᴍᴏᴠɪᴇs 💮', url='https://t.me/moviecenter_junction')
+            ],[      
+            InlineKeyboardButton('♻️ ʜᴇʟᴘ ♻️', callback_data='help'),
+            InlineKeyboardButton('♻️ ᴀʙᴏᴜᴛ ♻️', callback_data='about')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
         await message.reply_photo(
             photo=random.choice(PICS),
             caption=script.START_TXT.format(message.from_user.mention, temp.U_NAME, temp.B_NAME),
             reply_markup=reply_markup,
-            parse_mode='html'
+            parse_mode=enums.ParseMode.HTML
         )
         return
     data = message.command[1]
@@ -138,6 +141,7 @@ async def start(client, message):
                     chat_id=message.from_user.id,
                     file_id=msg.get("file_id"),
                     caption=f_caption,
+                    reply_markup=InlineKeyboardMarkup( [ [InlineKeyboardButton("⚡ ᴊᴏɪɴ ɢʀᴏᴜᴘ ⚡", url="https://t.me/movieflix_tg") ] ] ),
                     protect_content=msg.get('protect', False),
                     )
             except FloodWait as e:
@@ -241,11 +245,10 @@ async def start(client, message):
         chat_id=message.from_user.id,
         file_id=file_id,
         caption=f_caption,
+        reply_markup=InlineKeyboardMarkup( [ [ InlineKeyboardButton("⚡ᴊᴏɪɴ ɢʀᴏᴜᴘ⚡", url="https://t.me/moviecenter225"),
+                                               InlineKeyboardButton("💥ꜱʜᴀʀᴇ💥", url="https://t.me/share/url?url=https://t.me/moviecenter225") ],
+                                             [ InlineKeyboardButton("🔖❤️‍🔥 Jᴏɪɴ ᴏᴜʀ ᴄʜᴀɴɴᴇʟ ❤️‍🔥🔖", url="https://t.me/+5JhGlEwbBbdiZTg1") ] ] ),
         protect_content=True if pre == 'filep' else False,
-         reply_markup=InlineKeyboardMarkup( [ [ InlineKeyboardButton("⚡ᴊᴏɪɴ ɢʀᴏᴜᴘ⚡", url="https://t.me/moviecenter225"),
-                                              InlineKeyboardButton("💥ꜱʜᴀʀᴇ💥", url="https://t.me/share/url?url=https://t.me/moviecenter225") ],
-                                            [ InlineKeyboardButton("❤️‍🔥 Jᴏɪɴ ᴏᴜʀ ᴄʜᴀɴɴᴇʟ ❤️‍🔥", url="https://t.me/+5JhGlEwbBbdiZTg1") ] ] )
-        
         )
                     
 
@@ -372,7 +375,7 @@ async def settings(client, message):
         return await message.reply(f"You are anonymous admin. Use /connect {message.chat.id} in PM")
     chat_type = message.chat.type
 
-    if chat_type == "private":
+    if chat_type == enums.ChatType.PRIVATE:
         grpid = await active_connection(str(userid))
         if grpid is not None:
             grp_id = grpid
@@ -386,7 +389,7 @@ async def settings(client, message):
             await message.reply_text("I'm not connected to any groups!", quote=True)
             return
 
-    elif chat_type in ["group", "supergroup"]:
+    elif chat_type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
         grp_id = message.chat.id
         title = message.chat.title
 
@@ -395,8 +398,8 @@ async def settings(client, message):
 
     st = await client.get_chat_member(grp_id, userid)
     if (
-            st.status != "administrator"
-            and st.status != "creator"
+            st.status != enums.ChatMemberStatus.ADMINISTRATOR
+            and st.status != enums.ChatMemberStatus.OWNER
             and str(userid) not in ADMINS
     ):
         return
@@ -473,8 +476,8 @@ async def settings(client, message):
             text=f"<b>Change Your Settings for {title} As Your Wish ⚙</b>",
             reply_markup=reply_markup,
             disable_web_page_preview=True,
-            parse_mode="html",
-            reply_to_message_id=message.message_id
+            parse_mode=enums.ParseMode.HTML,
+            reply_to_message_id=message.id
         )
 
 
@@ -487,7 +490,7 @@ async def save_template(client, message):
         return await message.reply(f"You are anonymous admin. Use /connect {message.chat.id} in PM")
     chat_type = message.chat.type
 
-    if chat_type == "private":
+    if chat_type == enums.ChatType.PRIVATE:
         grpid = await active_connection(str(userid))
         if grpid is not None:
             grp_id = grpid
@@ -501,7 +504,7 @@ async def save_template(client, message):
             await message.reply_text("I'm not connected to any groups!", quote=True)
             return
 
-    elif chat_type in ["group", "supergroup"]:
+    elif chat_type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
         grp_id = message.chat.id
         title = message.chat.title
 
@@ -510,8 +513,8 @@ async def save_template(client, message):
 
     st = await client.get_chat_member(grp_id, userid)
     if (
-            st.status != "administrator"
-            and st.status != "creator"
+            st.status != enums.ChatMemberStatus.ADMINISTRATOR
+            and st.status != enums.ChatMemberStatus.OWNER
             and str(userid) not in ADMINS
     ):
         return
@@ -521,3 +524,4 @@ async def save_template(client, message):
     template = message.text.split(" ", 1)[1]
     await save_group_settings(grp_id, 'template', template)
     await sts.edit(f"Successfully changed template for {title} to\n\n{template}")
+ee
